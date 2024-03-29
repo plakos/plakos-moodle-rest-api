@@ -61,6 +61,7 @@ class ws_plakos_external extends external_api {
         global $DB;
 
         // a mapping of allowed question classes to api parameters
+        // TODO: optimize this, feels like a bit too much back and forth in the following code
         $allowedTypes = [
             qtype_multichoice_single_question::class => 'multichoice',
             qtype_multianswer_question::class => 'multiple_answer'
@@ -79,6 +80,7 @@ class ws_plakos_external extends external_api {
         );
         $givenCourseId = $params['courseid'];
 
+        // validate given types in detail
         $invalidTypeMessage = sprintf(
             'Invalid question type submitted in parameter "types": %%s. Allowed: %s',
             implode(', ', $defaultTypes)
@@ -94,13 +96,12 @@ class ws_plakos_external extends external_api {
             $filterTypes[$questionClass] = $typeToCheck;
         }
 
-        // fetch course identified by the get param
+        // fetch given course
         if(!$DB->record_exists('course', ['id' => $givenCourseId])) {
             throw new invalid_parameter_exception(
                 sprintf('Course with id %d not found', $givenCourseId)
             );
         }
-
 
         // fetch context and categories based on the found context
         $context = context_course::instance($givenCourseId);
@@ -118,30 +119,26 @@ class ws_plakos_external extends external_api {
         // reduce records to id only
         $categoryIds = array_map(fn($dbCategory) => $dbCategory->id, $dbCategories);
 
-        // fetch all questions
+        // quote types so we can use them in the "IN" condition
         $quotedGivenTypes = array_map(fn($type) => "'" . $type . "'", $givenTypes);
 
-        // this function sadly does not make use of the pagination,
-        // but that is fine for now.
+        // the inner workings of this function sadly does not make use of the pagination
         $questionIds = array_values(question_bank::get_finder()->get_questions_from_categories(
             $categoryIds, 'qtype IN (' . implode(',', $quotedGivenTypes) . ')'
         ));
 
+        // virtual pagination
         $pagedQuestionIds = array_slice($questionIds,
-            ($params['page'] - 1) * $params['perpage'], $params['perpage']);
+            ($params['page'] - 1) * $params['perpage'], $params['perpage']
+        );
 
         $questions = [];
-        // now loop the questions and fetch them using the internal question
-        // bank features
+        // now loop the questions and fetch them using the internal question bank features
         foreach($pagedQuestionIds as $questionId) {
 
             $questionFromBank = question_bank::load_question($questionId);
 
-            // check if the given question type is in the list of filtered
-            if(!isset($filterTypes[get_class($questionFromBank)])) {
-                continue;
-            }
-
+            // build question response
             $question = [
                 'id' => $questionFromBank->id,
                 'title' => $questionFromBank->name,
@@ -167,7 +164,7 @@ class ws_plakos_external extends external_api {
     /**
      * Parameter description for get_questions().
      *
-     * @return external_description
+     * @return external_multiple_structure
      */
     public static function get_questions_returns() {
         return new external_multiple_structure(
