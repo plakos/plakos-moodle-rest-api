@@ -1,0 +1,48 @@
+{
+  "name": "art4/moodle-plugin-boilerplate",
+  "description": "Boilerplate for moodle plugin develoment",
+  "type": "project",
+  "license": "GPL3-or-later",
+  "authors": [
+    {
+      "name": "Artur Weigandt"
+    }
+  ],
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.4.0",
+    "mockery/mockery": "^1.5.0",
+    "moodlehq/moodle-plugin-ci": "^4.1",
+    "phpunit/phpunit": "^9.6",
+    "vimeo/psalm": "^5.4.0"
+  },
+  "scripts": {
+    "lint": "moodle-plugin-ci phplint ./local_moodle_plugin",
+    "phpcpd": "moodle-plugin-ci phpcpd ./local_moodle_plugin",
+    "phpmd": "moodle-plugin-ci phpmd ./local_moodle_plugin",
+    "phpcs": "phpcs --standard=moodle-extra --exclude=moodle.Files.BoilerplateComment --extensions=php -p -w -s --colors --report-full --report-width=132 --encoding=utf-8 ./local_moodle_plugin"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/moodlehq/moodle-local_ci.git"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "moodlehq/moodle-local_moodlecheck",
+        "version": "1.1.8",
+        "source": {
+          "url": "https://github.com/moodlehq/moodle-local_moodlecheck.git",
+          "type": "git",
+          "reference": "v1.1.8"
+        }
+      }
+    }
+  ],
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}
