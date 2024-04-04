@@ -1,52 +1,69 @@
 <?php
 
-defined('MOODLE_INTERNAL') || die;
-
-require_once($CFG->dirroot . '/lib/externallib.php');
-require_once($CFG->dirroot . '/question/engine/bank.php');
-
 /**
- * Web service API definition.
+ * Plakos Moodle Webservices - External API
  *
- * @package local_ws_plakos
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_ws_plakos
+ * @copyright 2024 Plakos GmbH <info@plakos.de>
+ * @license   TODO
  */
 
-class ws_plakos_external extends external_api {
+defined('MOODLE_INTERNAL') || die;
+
+require_once $CFG->dirroot . '/lib/externallib.php';
+require_once $CFG->dirroot . '/question/engine/bank.php';
+
+/**
+ * Plakos Moodle Webservices - External API
+ *
+ * @package   local_ws_plakos
+ * @copyright 2024 Plakos GmbH <info@plakos.de>
+ * @license   TODO
+ */
+
+class ws_plakos_external extends external_api
+{
 
     /**
      * Parameter description for get_questions().
      *
      * @return external_function_parameters.
      */
-    public static function get_questions_parameters() {
+    public static function get_questions_parameters()
+    {
 
-        $courseIdParameter = new external_value(PARAM_INT,
+        $courseIdParameter = new external_value(
+            PARAM_INT,
             'The course for which we are selecting questions',
             VALUE_REQUIRED, null, NULL_NOT_ALLOWED
         );
 
-        $typesParameter = new external_value(PARAM_TEXT,
+        $typesParameter = new external_value(
+            PARAM_TEXT,
             'The question types to be returned',
             VALUE_DEFAULT
         );
 
-        $pageParameter = new external_value(PARAM_INT,
+        $pageParameter = new external_value(
+            PARAM_INT,
             'The question page offset',
             VALUE_DEFAULT, 1
         );
 
-        $perpageParameter = new external_value(PARAM_INT,
+        $perpageParameter = new external_value(
+            PARAM_INT,
             'The number of questions to be returned',
             VALUE_DEFAULT, 10
         );
 
-        return new external_function_parameters([
+        return new external_function_parameters(
+            [
             'courseid' => $courseIdParameter,
             'types' => $typesParameter,
             'page' => $pageParameter,
             'perpage' => $perpageParameter,
-        ]);
+            ]
+        );
     }
 
     /**
@@ -57,7 +74,8 @@ class ws_plakos_external extends external_api {
      * @return array Array of arrays with questions.
      * @throws dml_exception
      */
-    public static function get_questions(?int $courseid, ?string $types, ?int $page = null, ?int $perpage = null) {
+    public static function get_questions(?int $courseid, ?string $types, ?int $page = null, ?int $perpage = null)
+    {
         global $DB;
 
         // a mapping of allowed question classes to api parameters
@@ -68,12 +86,14 @@ class ws_plakos_external extends external_api {
         ];
         $defaultTypes = array_values($allowedTypes);
 
-        $params = self::validate_parameters(self::get_questions_parameters(), [
+        $params = self::validate_parameters(
+            self::get_questions_parameters(), [
             'courseid' => $courseid,
             'types' => implode(', ', $defaultTypes),
             'page' => $page,
             'perpage' => $perpage,
-        ]);
+            ]
+        );
 
         $givenTypes = array_filter(
             array_map('trim', explode(',', $params['types']))
@@ -112,9 +132,11 @@ class ws_plakos_external extends external_api {
         }
 
         // TODO: Research what the categories are (top, default, ..)
-        $dbCategories = $DB->get_records('question_categories', [
+        $dbCategories = $DB->get_records(
+            'question_categories', [
             'contextid' => $context->id
-        ], '', 'id');
+            ], '', 'id'
+        );
 
         // reduce records to id only
         $categoryIds = array_map(fn($dbCategory) => $dbCategory->id, $dbCategories);
@@ -123,12 +145,15 @@ class ws_plakos_external extends external_api {
         $quotedGivenTypes = array_map(fn($type) => "'" . $type . "'", $givenTypes);
 
         // the inner workings of this function sadly does not make use of the pagination
-        $questionIds = array_values(question_bank::get_finder()->get_questions_from_categories(
-            $categoryIds, 'qtype IN (' . implode(',', $quotedGivenTypes) . ')'
-        ));
+        $questionIds = array_values(
+            question_bank::get_finder()->get_questions_from_categories(
+                $categoryIds, 'qtype IN (' . implode(',', $quotedGivenTypes) . ')'
+            )
+        );
 
         // virtual pagination
-        $pagedQuestionIds = array_slice($questionIds,
+        $pagedQuestionIds = array_slice(
+            $questionIds,
             ($params['page'] - 1) * $params['perpage'], $params['perpage']
         );
 
@@ -166,20 +191,23 @@ class ws_plakos_external extends external_api {
      *
      * @return external_multiple_structure
      */
-    public static function get_questions_returns() {
+    public static function get_questions_returns()
+    {
         return new external_multiple_structure(
             new external_single_structure(
                 [
                     'id' => new external_value(PARAM_INT, 'ID of the question', VALUE_DEFAULT),
                     'title' => new external_value(PARAM_TEXT, 'Name of the question', VALUE_DEFAULT),
                     'answers' => new external_multiple_structure(
-                        new external_single_structure([
+                        new external_single_structure(
+                            [
                             'id' => new external_value(PARAM_INT, 'ID of the answer', VALUE_DEFAULT),
                             'text' => new external_value(PARAM_RAW, 'Text of the answer', VALUE_DEFAULT),
                             'fraction' => new external_value(PARAM_FLOAT, 'Correctness Fraction of the answer where 100 = correct, 0 = wrong, inbetween => ?', VALUE_DEFAULT),
                             'correct' => new external_value(PARAM_BOOL, 'Value indicating whether the answer is correct.', VALUE_DEFAULT),
                             'feedback' => new external_value(PARAM_TEXT, 'Feedback text', VALUE_DEFAULT),
-                        ])
+                            ]
+                        )
                     )
                 ]
             )

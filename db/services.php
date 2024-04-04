@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Plakos Moodle Webservices - API Service configuration
+ *
+ * @package   local_ws_plakos
+ * @copyright 2024 Plakos GmbH <info@plakos.de>
+ * @license   TODO
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
