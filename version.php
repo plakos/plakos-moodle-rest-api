@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Plakos Moodle Webservices - Version file
@@ -10,11 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @var \stdClass $plugin 
-*/
+// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+/* @var \stdClass $plugin */
 $plugin->component = 'local_ws_plakos';
-$plugin->version = 2023100900; //4.3
+$plugin->version = 2023100900; // 4.3
 $plugin->requires = 2023100900;
 $plugin->supported = [403, 403];
 $plugin->maturity = MATURITY_ALPHA;
