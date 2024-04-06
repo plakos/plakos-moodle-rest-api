@@ -41,7 +41,7 @@ class qtype_helper {
      *
      * @return array
      */
-    public function default_types()  : array {
+    public function default_types(): array {
         return array_keys(self::TYPES);
     }
 
@@ -51,7 +51,7 @@ class qtype_helper {
      * @param string|null $types
      * @return array
      */
-    public function parse_from_comma_string(?string $types = null) : array {
+    public function parse_from_comma_string(?string $types = null): array {
         return array_map('strtolower', array_map('trim', explode(',', $types)));
     }
 
@@ -61,7 +61,7 @@ class qtype_helper {
      * @param array $giventypes
      * @return bool
      */
-    public function validate_given(array $giventypes) : bool {
+    public function validate_given(array $giventypes): bool {
         foreach ($giventypes as $giventype) {
             if (!isset(self::TYPES[$giventype])) {
                 return false;
@@ -77,7 +77,7 @@ class qtype_helper {
      * @param array $types
      * @return array
      */
-    public function quote(array $types) : array {
+    public function quote(array $types): array {
         return array_map(fn($type) => "'" . $type . "'", $types);
     }
 
@@ -87,7 +87,7 @@ class qtype_helper {
      * @param \question_definition $question
      * @return string|null
      */
-    public function translate_type(\question_definition $question) : ?string {
+    public function translate_type(\question_definition $question): ?string {
         return array_search(get_class($question), self::TYPES) ?: null;
     }
 
@@ -97,7 +97,7 @@ class qtype_helper {
      * @param \question_definition $questionfrombank
      * @return array
      */
-    public function to_array(\question_definition $questionfrombank) : array {
+    public function to_array(\question_definition $questionfrombank): array {
         // Build question response.
         $question = [
             'id' => $questionfrombank->id,
@@ -117,7 +117,7 @@ class qtype_helper {
      * @param \question_definition $questionfrombank
      * @return array
      */
-    public function multichoice_single_question_to_array(array $question, \question_definition $questionfrombank) : array {
+    public function multichoice_single_question_to_array(array $question, \question_definition $questionfrombank): array {
         // Build answer response(s) for multichoice question.
         $question['answers'] = [];
         foreach ($questionfrombank->answers as $answer) {

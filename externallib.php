@@ -45,7 +45,7 @@ class ws_plakos_external extends external_api {
      *
      * @return external_function_parameters.
      */
-    public static function get_questions_parameters() : external_function_parameters {
+    public static function get_questions_parameters(): external_function_parameters {
 
         $courseidparameter = new external_value(
             PARAM_INT,
@@ -92,7 +92,7 @@ class ws_plakos_external extends external_api {
      * @throws dml_exception
      * @throws invalid_parameter_exception
      */
-    public static function get_questions(?int $courseid, ?string $types, ?int $page, ?int $perpage) : array {
+    public static function get_questions(?int $courseid, ?string $types, ?int $page, ?int $perpage): array {
         global $DB;
 
         $qtypehelper = new qtype_helper();
