@@ -64,7 +64,7 @@ class qtype_helper {
      */
     public function validate_given(array $giventypes): bool {
         foreach ($giventypes as $giventype) {
-            if(in_array($giventype, $this->default_types()) === false) {
+            if (in_array($giventype, $this->default_types()) === false) {
                 return false;
             }
         }
