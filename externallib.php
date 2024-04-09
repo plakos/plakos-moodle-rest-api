@@ -198,7 +198,7 @@ class ws_plakos_external extends external_api {
                                 'Value indicating whether the answer is correct.',
                                 VALUE_DEFAULT
                             ),
-                            'feedback' => new external_value(PARAM_TEXT,
+                            'feedback' => new external_value(PARAM_RAW,
                                 'Feedback text',
                                 VALUE_DEFAULT
                             ),

@@ -33,7 +33,8 @@ class qtype_helper {
      * The available types
      */
     const TYPES = [
-        'multichoice' => \qtype_multichoice_single_question::class,
+        \qtype_multichoice_single_question::class => 'multichoice',
+        \qtype_multichoice_multi_question::class => 'multichoice',
     ];
 
     /**
@@ -42,7 +43,7 @@ class qtype_helper {
      * @return array
      */
     public function default_types(): array {
-        return array_keys(self::TYPES);
+        return array_unique(array_values(self::TYPES));
     }
 
     /**
@@ -63,7 +64,7 @@ class qtype_helper {
      */
     public function validate_given(array $giventypes): bool {
         foreach ($giventypes as $giventype) {
-            if (!isset(self::TYPES[$giventype])) {
+            if(in_array($giventype, $this->default_types()) === false) {
                 return false;
             }
         }
@@ -88,7 +89,7 @@ class qtype_helper {
      * @return string|null
      */
     public function translate_type(\question_definition $question): ?string {
-        return array_search(get_class($question), self::TYPES) ?: null;
+        return self::TYPES[get_class($question)] ?? null;
     }
 
     /**
@@ -106,7 +107,10 @@ class qtype_helper {
         ];
 
         return match (get_class($questionfrombank)) {
-            \qtype_multichoice_single_question::class => $this->multichoice_single_question_to_array($question, $questionfrombank)
+            \qtype_multichoice_single_question::class,
+            \qtype_multichoice_multi_question::class =>
+                $this->multichoice_question_to_array($question, $questionfrombank),
+            default => []
         };
     }
 
@@ -117,7 +121,7 @@ class qtype_helper {
      * @param \question_definition $questionfrombank
      * @return array
      */
-    public function multichoice_single_question_to_array(array $question, \question_definition $questionfrombank): array {
+    public function multichoice_question_to_array(array $question, \question_definition $questionfrombank): array {
         // Build answer response(s) for multichoice question.
         $question['answers'] = [];
         foreach ($questionfrombank->answers as $answer) {
