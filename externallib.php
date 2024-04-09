@@ -169,7 +169,7 @@ class ws_plakos_external extends external_api {
         foreach ($pagedquestionids as $questionid) {
             $response = $qtypehelper->to_array(question_bank::load_question($questionid));
             if (count($response) > 0) {
-                $questions[] = $qtypehelper->to_array(question_bank::load_question($questionid));
+                $questions[] = $response;
             }
         }
 
