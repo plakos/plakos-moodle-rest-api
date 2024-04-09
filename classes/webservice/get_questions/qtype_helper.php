@@ -106,11 +106,12 @@ class qtype_helper {
             'type' => $this->translate_type($questionfrombank),
         ];
 
+        // TODO: Use the TYPES constant.
         return match (get_class($questionfrombank)) {
             \qtype_multichoice_single_question::class,
             \qtype_multichoice_multi_question::class =>
                 $this->multichoice_question_to_array($question, $questionfrombank),
-            default => []
+            default => [] // TODO: Maybe throw an exception.
         };
     }
 

@@ -167,7 +167,10 @@ class ws_plakos_external extends external_api {
         $questions = [];
         // Now loop the questions and fetch them using the internal question bank features.
         foreach ($pagedquestionids as $questionid) {
-            $questions[] = $qtypehelper->to_array(question_bank::load_question($questionid));
+            $response = $qtypehelper->to_array(question_bank::load_question($questionid));
+            if (count($response) > 0) {
+                $questions[] = $qtypehelper->to_array(question_bank::load_question($questionid));
+            }
         }
 
         return $questions;
