@@ -31,4 +31,10 @@ $functions = [
         'description' => 'Gets the questions from the question bank for the given course',
         'type' => 'read',
     ],
+    'plakos_is_enrolled' => [
+        'classname' => 'ws_plakos_external',
+        'methodname' => 'is_enrolled',
+        'description' => 'Gets a value indicating whether the given user id has an active enrolment in the given course.',
+        'type' => 'read',
+    ]
 ];
