@@ -219,7 +219,7 @@ class ws_plakos_external extends external_api {
     /**
      * Parameter description for get_questions().
      *
-     * @return external_function_parameters.
+     * @return external_function_parameters
      */
     public static function is_enrolled_parameters() {
         $courseidparameter = new external_value(
@@ -242,6 +242,9 @@ class ws_plakos_external extends external_api {
         );
     }
 
+    /**
+     * @return array
+     */
     public static function is_enrolled(?int $courseid, ?int $userid) {
         $context = context_course::instance($courseid);
         return [
