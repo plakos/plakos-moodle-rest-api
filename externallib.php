@@ -243,6 +243,11 @@ class ws_plakos_external extends external_api {
     }
 
     /**
+     * Description for is_enrolled().
+     *
+     * @param null|int $courseid
+     * @param null|int $userid
+     *
      * @return array
      */
     public static function is_enrolled(?int $courseid, ?int $userid) {
