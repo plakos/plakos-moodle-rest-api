@@ -22,12 +22,15 @@
  * @license   TODO
  */
 
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
 use local_ws_plakos\webservice\get_questions\qtype_helper;
-use local_ws_plakos\webservice\get_questions\validator;
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot . '/lib/externallib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
 
 /**
@@ -216,17 +219,16 @@ class ws_plakos_external extends external_api {
     /**
      * Parameter description for get_questions().
      *
-     * @return external_function_parameters.
+     * @return external_function_parameters
      */
-    public static function is_enrolled_parameters()
-    {
-        $courseIdParameter = new external_value(
+    public static function is_enrolled_parameters() {
+        $courseidparameter = new external_value(
             PARAM_INT,
             'The course for which we check the enrollment',
             VALUE_REQUIRED, null, NULL_NOT_ALLOWED
         );
 
-        $userIdParameter = new external_value(
+        $useridparameter = new external_value(
             PARAM_INT,
             'The user for which we check the enrollment',
             VALUE_REQUIRED, null, NULL_NOT_ALLOWED
@@ -234,18 +236,26 @@ class ws_plakos_external extends external_api {
 
         return new external_function_parameters(
             [
-                'courseid' => $courseIdParameter,
-                'userid' => $userIdParameter,
+                'courseid' => $courseidparameter,
+                'userid' => $useridparameter,
             ]
         );
     }
 
+    /**
+     * Description for is_enrolled().
+     *
+     * @param null|int $courseid
+     * @param null|int $userid
+     *
+     * @return array
+     */
     public static function is_enrolled(?int $courseid, ?int $userid) {
         $context = context_course::instance($courseid);
         return [
             'courseid' => $courseid,
             'userid' => $userid,
-            'is_enrolled' => is_enrolled($context, $userid)
+            'is_enrolled' => is_enrolled($context, $userid),
         ];
     }
 
@@ -254,12 +264,11 @@ class ws_plakos_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function is_enrolled_returns()
-    {
+    public static function is_enrolled_returns() {
         return new external_single_structure([
             'userid' => new external_value(PARAM_INT, 'ID of the user', VALUE_DEFAULT),
             'courseid' => new external_value(PARAM_INT, 'ID of the course', VALUE_DEFAULT),
-            'is_enrolled' => new external_value(PARAM_BOOL, 'Flag indicating whether the user is enrolled', VALUE_DEFAULT)
+            'is_enrolled' => new external_value(PARAM_BOOL, 'Flag indicating whether the user is enrolled', VALUE_DEFAULT),
         ]);
     }
 }
