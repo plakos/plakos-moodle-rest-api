@@ -247,7 +247,7 @@ class ws_plakos_external extends external_api {
         return [
             'courseid' => $courseid,
             'userid' => $userid,
-            'is_enrolled' => is_enrolled($context, $userid)
+            'is_enrolled' => is_enrolled($context, $userid),
         ];
     }
 
@@ -256,12 +256,11 @@ class ws_plakos_external extends external_api {
      *
      * @return external_single_structure
      */
-    public static function is_enrolled_returns()
-    {
+    public static function is_enrolled_returns() {
         return new external_single_structure([
             'userid' => new external_value(PARAM_INT, 'ID of the user', VALUE_DEFAULT),
             'courseid' => new external_value(PARAM_INT, 'ID of the course', VALUE_DEFAULT),
-            'is_enrolled' => new external_value(PARAM_BOOL, 'Flag indicating whether the user is enrolled', VALUE_DEFAULT)
+            'is_enrolled' => new external_value(PARAM_BOOL, 'Flag indicating whether the user is enrolled', VALUE_DEFAULT),
         ]);
     }
 }

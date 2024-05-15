@@ -36,5 +36,5 @@ $functions = [
         'methodname' => 'is_enrolled',
         'description' => 'Gets a value indicating whether the given user id has an active enrolment in the given course.',
         'type' => 'read',
-    ]
+    ],
 ];
