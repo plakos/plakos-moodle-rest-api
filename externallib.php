@@ -50,7 +50,7 @@ class ws_plakos_external extends external_api {
      */
     public static function get_questions_parameters(): external_function_parameters {
 
-        $course_id_parameter = new external_value(
+        $courseidparameter = new external_value(
             PARAM_INT,
             'The course for which we are selecting questions',
             VALUE_REQUIRED, null, NULL_NOT_ALLOWED
@@ -76,7 +76,7 @@ class ws_plakos_external extends external_api {
 
         return new external_function_parameters(
             [
-            'courseid' => $course_id_parameter,
+            'courseid' => $courseidparameter,
             'types' => $typesparameter,
             'page' => $pageparameter,
             'perpage' => $perpageparameter,
@@ -222,13 +222,13 @@ class ws_plakos_external extends external_api {
      * @return external_function_parameters.
      */
     public static function is_enrolled_parameters() {
-        $course_id_parameter = new external_value(
+        $courseidparameter = new external_value(
             PARAM_INT,
             'The course for which we check the enrollment',
             VALUE_REQUIRED, null, NULL_NOT_ALLOWED
         );
 
-        $user_id_parameter = new external_value(
+        $useridparameter = new external_value(
             PARAM_INT,
             'The user for which we check the enrollment',
             VALUE_REQUIRED, null, NULL_NOT_ALLOWED
@@ -236,8 +236,8 @@ class ws_plakos_external extends external_api {
 
         return new external_function_parameters(
             [
-                'courseid' => $course_id_parameter,
-                'userid' => $user_id_parameter,
+                'courseid' => $courseidparameter,
+                'userid' => $useridparameter,
             ]
         );
     }
