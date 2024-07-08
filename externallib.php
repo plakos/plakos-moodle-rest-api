@@ -120,7 +120,7 @@ class ws_plakos_external extends external_api {
 
         // A small helper function that creates sql placeholder strings for the queries. Without this, we would run.
         // Into a max 30 character limit for sql placeholders.
-        $ph = function(string $filter, string $value, int $length = 3) : string {
+        $ph = function(string $filter, string $value, int $length = 3): string {
             return implode('_',
                 array_map(
                     fn ($f) => substr($f, 0, $length),
