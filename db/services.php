@@ -42,5 +42,5 @@ $functions = [
         'methodname' => 'onboarding_values',
         'description' => 'Helper endpoint to create an onboarding flow to filter courses using custom checkbox fields.',
         'type' => 'read',
-    ],
+    ]
 ];

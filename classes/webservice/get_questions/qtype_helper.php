@@ -128,10 +128,10 @@ class qtype_helper {
         foreach ($questionfrombank->answers as $answer) {
             $question['answers'][] = [
                 'id' => $answer->id,
-                'text' => $answer->answer,
+                'text' => htmlspecialchars_decode(strip_tags($answer->answer)),
                 'fraction' => $answer->fraction,
                 'correct' => floatval($answer->fraction) === 1.0,
-                'feedback' => $answer->feedback,
+                'feedback' => htmlspecialchars_decode(strip_tags($answer->feedback)),
             ];
         }
 

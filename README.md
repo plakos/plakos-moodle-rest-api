@@ -105,3 +105,22 @@ Only the course id is mandatory, the other parameters have sensible defaults:
 
 #### Return values
 
+### `plakos_get_questions`
+
+This endpoint returns a list of questions depending on the given criteria.
+
+#### Parameters
+
+- `courseid`: The ID of the course.
+- `types`: A list of moodle question types to be returned.
+- `page`: The page offset.
+- `perpage`: The max. number of question to be returned from the endpoint.
+
+Only the course id is mandatory, the other parameters have sensible defaults:
+
+- `types`: All questions types are returned.
+- `page`: 1
+- `perpage`: 100
+
+#### Return values
+
