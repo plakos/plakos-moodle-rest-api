@@ -8,7 +8,7 @@ A plugin for moodle that exposes various API endpoints crafted specifically for 
 - `plakos_is_enrolled` Gets a value indicating whether a user is enrolled in the given course. There is a bug in
   moodle that prevents getting this information.
 - `plakos_onboarding_values` An endpoint to provide information needed for an onboarding feature in the app.
-
+qq
 ## Development Setup
 
 This is special for moodle as it does not support composer of any kind. This approach is just one
