@@ -19,7 +19,7 @@
  *
  * @package   local_ws_plakos
  * @copyright 2024 Plakos GmbH <info@plakos.de>
- * @license   TODO
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['pluginname'] = 'Plakos Moodle REST Plugin';

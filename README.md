@@ -2,6 +2,13 @@
 
 A plugin for moodle that exposes various API endpoints crafted specifically for plakos.
 
+## Endpoints
+
+- `plakos_get_questions` This endpoint returns a list of questions depending on the given criteria.
+- `plakos_is_enrolled` Gets a value indicating whether a user is enrolled in the given course. There is a bug in
+  moodle that prevents getting this information.
+- `plakos_onboarding_values` An endpoint to provide information needed for an onboarding feature in the app.
+
 ## Development Setup
 
 This is special for moodle as it does not support composer of any kind. This approach is just one
@@ -83,44 +90,3 @@ git clone git@github.com:moodlehq/moodle-plugin-ci.git
 ```
 ./bin/moodle-docker-compose exec webserver bash -c "ln -s /var/www/plugin /var/www/html/local/ws_plakos"
 ```
-
-## Endpoints
-
-### `plakos_get_questions`
-
-This endpoint returns a list of questions depending on the given criteria.
-
-#### Parameters
-
-- `courseid`: The ID of the course.
-- `types`: A list of moodle question types to be returned.
-- `page`: The page offset.
-- `perpage`: The max. number of question to be returned from the endpoint.
-
-Only the course id is mandatory, the other parameters have sensible defaults:
-
-- `types`: All questions types are returned.
-- `page`: 1
-- `perpage`: 100
-
-#### Return values
-
-### `plakos_get_questions`
-
-This endpoint returns a list of questions depending on the given criteria.
-
-#### Parameters
-
-- `courseid`: The ID of the course.
-- `types`: A list of moodle question types to be returned.
-- `page`: The page offset.
-- `perpage`: The max. number of question to be returned from the endpoint.
-
-Only the course id is mandatory, the other parameters have sensible defaults:
-
-- `types`: All questions types are returned.
-- `page`: 1
-- `perpage`: 100
-
-#### Return values
-
