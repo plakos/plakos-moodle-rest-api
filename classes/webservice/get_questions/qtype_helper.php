@@ -130,7 +130,7 @@ class qtype_helper {
                 'id' => $answer->id,
                 'text' => htmlspecialchars_decode(strip_tags($answer->answer)),
                 'fraction' => $answer->fraction,
-                'correct' => floatval($answer->fraction) === 1.0,
+                'correct' => floatval($answer->fraction) > 0,
                 'feedback' => htmlspecialchars_decode(strip_tags($answer->feedback)),
             ];
         }

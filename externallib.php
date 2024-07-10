@@ -279,7 +279,7 @@ class ws_plakos_external extends external_api {
     }
 
     /**
-     * Parameter description for get_questions().
+     * Parameter description for onboarding_values().
      *
      * @return external_single_structure
      */
@@ -509,7 +509,7 @@ class ws_plakos_external extends external_api {
                                 'id' => new external_value(PARAM_INT, 'ID of the answer', VALUE_DEFAULT),
                                 'text' => new external_value(PARAM_RAW, 'Text of the answer', VALUE_DEFAULT),
                                 'fraction' => new external_value(PARAM_FLOAT,
-                                    'Correctness Fraction of the answer where 100 = correct, 0 = wrong, inbetween => ?',
+                                    'Correctness Fraction of the answer where > 0 = correct',
                                     VALUE_DEFAULT
                                 ),
                                 'correct' => new external_value(PARAM_BOOL,
@@ -529,7 +529,7 @@ class ws_plakos_external extends external_api {
     }
 
     /**
-     * Parameter description for get_questions().
+     * Parameter description for is_enrolled().
      *
      * @return external_function_parameters.
      */
