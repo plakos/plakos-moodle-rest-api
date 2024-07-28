@@ -529,6 +529,62 @@ class ws_plakos_external extends external_api {
     }
 
     /**
+     * Parameter description for get_questions().
+     *
+     * @return external_function_parameters.
+     */
+    public static function finish_onboarding_parameters(): external_function_parameters {
+
+        $useridparameter = new external_value(
+            PARAM_INT,
+            'The ID of the user',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+
+        return new external_function_parameters(
+            [
+                'userid' => $useridparameter,
+            ]
+        );
+    }
+
+    /**
+     * This function sets the flag indicating whether the onboarding is finished.
+     *
+     * @param int $userid
+     * @return array Array of nothing.
+     * @throws dml_exception
+     */
+    public static function finish_onboarding(int $userid): array {
+        global $DB;
+
+        $user = \core_user::get_user($userid);
+        if($user) {
+            $user->profile_field_onboarding_success = 1;
+            profile_save_data($user);
+        }
+
+        // dummy response
+        return [
+            'success' => true
+        ];
+    }
+
+
+    /**
+     * Return description for finish_onboarding().
+     *
+     * @return external_single_structure
+     */
+    public static function finish_onboarding_returns() {
+        new external_single_structure(
+            [
+                'success' => new external_value(PARAM_BOOL, 'Successful or not', VALUE_DEFAULT),
+            ]
+        );
+    }
+
+    /**
      * Parameter description for is_enrolled().
      *
      * @return external_function_parameters.
