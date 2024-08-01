@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 /** @var $CFG \stdClass */
 require_once($CFG->dirroot . '/lib/externallib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
+require_once($CFG->dirroot . '/user/profile/lib.php');
 
 /**
  * Plakos Moodle Webservices - External API
@@ -549,7 +550,7 @@ class ws_plakos_external extends external_api {
     }
 
     /**
-     * This function sets the flag indicating whether the onboarding is finished.
+     * This function sets the user flag indicating whether the onboarding is finished.
      *
      * @param int $userid
      * @return array Array of nothing.
@@ -558,19 +559,15 @@ class ws_plakos_external extends external_api {
     public static function finish_onboarding(int $userid): array {
         global $DB, $CFG;
 
-        require_once($CFG->dirroot.'/user/profile/lib.php');
-
         $user = \core_user::get_user($userid);
         if($user) {
-            $user->profile_field_onboarding_success = 1;
+            $user->profile_field_onboarding_finished = 1;
             profile_save_data($user);
         }
 
-        $user = \core_user::get_user($userid);
-
         // dummy response
         return [
-            'onboarding_success' => $user->profile_field_onboarding_success
+            'onboarding_finished' => true
         ];
     }
 
