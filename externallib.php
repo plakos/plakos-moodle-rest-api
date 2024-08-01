@@ -556,12 +556,14 @@ class ws_plakos_external extends external_api {
      * @throws dml_exception
      */
     public static function finish_onboarding(int $userid): array {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot.'/user/profile/lib.php');
 
         $user = \core_user::get_user($userid);
         if($user) {
             $user->profile_field_onboarding_success = 1;
-            \profile_save_data($user);
+            profile_save_data($user);
         }
 
         // dummy response
