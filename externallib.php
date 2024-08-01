@@ -560,14 +560,14 @@ class ws_plakos_external extends external_api {
         global $DB, $CFG;
 
         $user = \core_user::get_user($userid);
-        if($user) {
+        if ($user) {
             $user->profile_field_onboarding_finished = 1;
             profile_save_data($user);
         }
 
-        // dummy response
+        // Dummy response.
         return [
-            'onboarding_finished' => true
+            'onboarding_finished' => true,
         ];
     }
 
