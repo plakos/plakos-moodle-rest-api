@@ -561,7 +561,7 @@ class ws_plakos_external extends external_api {
         $user = \core_user::get_user($userid);
         if($user) {
             $user->profile_field_onboarding_success = 1;
-            profile_save_data($user);
+            \profile_save_data($user);
         }
 
         // dummy response
