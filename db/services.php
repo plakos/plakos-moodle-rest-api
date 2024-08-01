@@ -31,6 +31,12 @@ $functions = [
         'description' => 'Gets the questions from the question bank for the given course',
         'type' => 'read',
     ],
+    'plakos_finish_onboarding' => [
+        'classname' => 'ws_plakos_external',
+        'methodname' => 'finish_onboarding',
+        'description' => 'Sets a user flag indicating that the user onboarding is finished.',
+        'type' => 'write',
+    ],
     'plakos_is_enrolled' => [
         'classname' => 'ws_plakos_external',
         'methodname' => 'is_enrolled',

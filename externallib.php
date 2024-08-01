@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die;
 /** @var $CFG \stdClass */
 require_once($CFG->dirroot . '/lib/externallib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
+require_once($CFG->dirroot . '/user/profile/lib.php');
 
 /**
  * Plakos Moodle Webservices - External API
@@ -525,6 +526,62 @@ class ws_plakos_external extends external_api {
                     ),
                 ]
             )
+        );
+    }
+
+    /**
+     * Parameter description for get_questions().
+     *
+     * @return external_function_parameters.
+     */
+    public static function finish_onboarding_parameters(): external_function_parameters {
+
+        $useridparameter = new external_value(
+            PARAM_INT,
+            'The ID of the user',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+
+        return new external_function_parameters(
+            [
+                'userid' => $useridparameter,
+            ]
+        );
+    }
+
+    /**
+     * This function sets the user flag indicating whether the onboarding is finished.
+     *
+     * @param int $userid
+     * @return array Array of nothing.
+     * @throws dml_exception
+     */
+    public static function finish_onboarding(int $userid): array {
+        global $DB, $CFG;
+
+        $user = \core_user::get_user($userid);
+        if ($user) {
+            $user->profile_field_onboarding_finished = 1;
+            profile_save_data($user);
+        }
+
+        // Dummy response.
+        return [
+            'onboarding_finished' => true,
+        ];
+    }
+
+
+    /**
+     * Return description for finish_onboarding().
+     *
+     * @return external_single_structure
+     */
+    public static function finish_onboarding_returns() {
+        new external_single_structure(
+            [
+                'onboarding_success' => new external_value(PARAM_BOOL, 'Successful or not', VALUE_DEFAULT),
+            ]
         );
     }
 
