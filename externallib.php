@@ -566,9 +566,11 @@ class ws_plakos_external extends external_api {
             profile_save_data($user);
         }
 
+        $user = \core_user::get_user($userid);
+
         // dummy response
         return [
-            'success' => true
+            'onboarding_success' => $user->profile_field_onboarding_success
         ];
     }
 
@@ -581,7 +583,7 @@ class ws_plakos_external extends external_api {
     public static function finish_onboarding_returns() {
         new external_single_structure(
             [
-                'success' => new external_value(PARAM_BOOL, 'Successful or not', VALUE_DEFAULT),
+                'onboarding_success' => new external_value(PARAM_BOOL, 'Successful or not', VALUE_DEFAULT),
             ]
         );
     }
