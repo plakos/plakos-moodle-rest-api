@@ -623,7 +623,7 @@ class ws_plakos_external extends external_api {
         return [
             'courseid' => $courseid,
             'userid' => $userid,
-            'is_enrolled' => is_enrolled($context, $userid),
+            'is_enrolled' => is_enrolled($context, $userid, '', true),
         ];
     }
 
