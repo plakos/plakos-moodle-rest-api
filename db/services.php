@@ -49,4 +49,10 @@ $functions = [
         'description' => 'Helper endpoint to create an onboarding flow to filter courses using custom checkbox fields.',
         'type' => 'read',
     ],
+    'plakos_onboarding_selfenrol' => [
+        'classname' => 'ws_plakos_external',
+        'methodname' => 'onboarding_selfenrol',
+        'description' => 'Helper endpoint to create an onboarding flow to filter courses using custom checkbox fields.',
+        'type' => 'write',
+    ],
 ];

@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die;
 
 /** @var $CFG \stdClass */
 require_once($CFG->dirroot . '/lib/externallib.php');
+require_once($CFG->dirroot . '/enrol/externallib.php');
+require_once($CFG->dirroot . '/enrol/self/externallib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
 require_once($CFG->dirroot . '/user/profile/lib.php');
 
@@ -39,6 +41,66 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
  * @license   TODO
  */
 class ws_plakos_external extends external_api {
+
+    public static function onboarding_selfenrol_parameters(): external_function_parameters {
+        $courseIds = new external_value(
+            PARAM_TEXT,
+            'The course ids to self enrol in',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+
+        return new external_function_parameters([
+            'courseids' => $courseIds
+        ]);
+    }
+
+    public static function onboarding_selfenrol($courseids) {
+        $params = self::validate_parameters(self::onboarding_selfenrol_parameters(),
+            array(
+                'courseids' => $courseids
+            ));
+
+        $courseIdsSplitted = explode(',', $params['courseids']);
+        $return = [
+            'count' => 0,
+            'courses' => []
+        ];
+        foreach($courseIdsSplitted as $courseId) {
+            try {
+                $course = get_course($courseId);
+
+                $enrolmentMethods = core_enrol_external::get_course_enrolment_methods($courseId);
+                foreach($enrolmentMethods as $enrolmentMethod) {
+                    if($enrolmentMethod['type'] === 'self' && $enrolmentMethod['status'] === true) {
+                        try {
+                            enrol_self_external::enrol_user($courseId, '', $enrolmentMethod['id']);
+                            $return['count']++;
+                            $return['courses'][] = $course->fullname;
+                        }
+                        catch(\Exception $e) {
+                            // do nothing here..
+                        }
+                    }
+                }
+            }
+            catch(\Exception $e) {
+                // Do nothing
+                // echo $e->getMessage();
+            }
+        }
+
+        return $return;
+    }
+
+    public static function onboarding_selfenrol_returns()
+    {
+        return new external_single_structure([
+            'count' => new external_value(PARAM_INT, 'The number of courses the user is self-enrolled in', VALUE_DEFAULT),
+            'courses' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'The number of courses the user is self-enrolled in', VALUE_DEFAULT)
+            )
+        ]);
+    }
 
     /**
      * Parameter description for onboarding_values().
