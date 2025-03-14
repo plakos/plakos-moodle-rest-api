@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 /* @var \stdClass $plugin */
 $plugin->component = 'local_ws_plakos';
-$plugin->version = 2023100914; // 4.3
+$plugin->version = 2023100915; // 4.3
 $plugin->requires = 2022112800;
 $plugin->supported = [400, 403];
 $plugin->maturity = MATURITY_ALPHA;

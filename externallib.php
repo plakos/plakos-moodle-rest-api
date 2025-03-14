@@ -32,6 +32,8 @@ require_once($CFG->dirroot . '/enrol/externallib.php');
 require_once($CFG->dirroot . '/enrol/self/externallib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
 require_once($CFG->dirroot . '/user/profile/lib.php');
+require_once($CFG->dirroot . '/enrol/manual/lib.php');
+require_once($CFG->dirroot . '/enrol/externallib.php');
 
 /**
  * Plakos Moodle Webservices - External API
@@ -55,6 +57,8 @@ class ws_plakos_external extends external_api {
     }
 
     public static function onboarding_selfenrol($courseids) {
+        global $USER;
+
         $params = self::validate_parameters(self::onboarding_selfenrol_parameters(),
             array(
                 'courseids' => $courseids
@@ -63,27 +67,46 @@ class ws_plakos_external extends external_api {
         $courseIdsSplitted = explode(',', $params['courseids']);
         $return = [
             'count' => 0,
-            'courses' => []
+            'courses' => [],
+            'infos' => [],
         ];
         foreach($courseIdsSplitted as $courseId) {
             try {
-                $course = get_course($courseId);
+                if (!$course = get_course($courseId)) {
+                    $return['infos'][] = "Course not found: $courseId.";
+                    continue;
+                }
 
+                // Alle Einschreibemethoden für diesen Kurs abrufen
                 $enrolmentMethods = core_enrol_external::get_course_enrolment_methods($courseId);
-                foreach($enrolmentMethods as $enrolmentMethod) {
-                    if($enrolmentMethod['type'] === 'self' && $enrolmentMethod['status'] === true) {
-                        try {
-                            enrol_self_external::enrol_user($courseId, '', $enrolmentMethod['id']);
-                            $return['count']++;
-                            $return['courses'][] = $course->fullname;
-                        }
-                        catch(\Exception $e) {
-                            // do nothing here..
-                        }
+                $selfEnrolMethod = null;
+
+                foreach ($enrolmentMethods as $enrolmentMethod) {
+                    if ($enrolmentMethod['type'] === 'self' && $enrolmentMethod['status'] === true) {
+                        $selfEnrolMethod = $enrolmentMethod;
+                        break; // Nur eine Methode notwendig
                     }
                 }
+
+                if (!$selfEnrolMethod) {
+                    $return['infos'][] = "No active self enrolment for course $course->fullname ($courseId).";
+                    continue;
+                }
+
+                if (self::is_enrolled($courseId, $USER->id)['is_enrolled']) {
+                    $return['infos'][] = "User is already enrolled in course $course->fullname (ID $courseId).";
+                    continue;
+                }
+
+                // Nutzer per Selbsteinschreibung hinzufügen
+                enrol_self_external::enrol_user($courseId, $USER->id, $selfEnrolMethod['id']);
+
+                // Erfolg speichern
+                $return['count']++;
+                $return['courses'][] = $course->fullname;
             }
             catch(\Exception $e) {
+                echo $e->getMessage();
                 // Do nothing
                 // echo $e->getMessage();
             }
@@ -98,7 +121,10 @@ class ws_plakos_external extends external_api {
             'count' => new external_value(PARAM_INT, 'The number of courses the user is self-enrolled in', VALUE_DEFAULT),
             'courses' => new external_multiple_structure(
                 new external_value(PARAM_TEXT, 'The number of courses the user is self-enrolled in', VALUE_DEFAULT)
-            )
+            ),
+            'infos' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'A list of errors that occured', VALUE_DEFAULT)
+            ),
         ]);
     }
 
@@ -699,6 +725,124 @@ class ws_plakos_external extends external_api {
             'userid' => new external_value(PARAM_INT, 'ID of the user', VALUE_DEFAULT),
             'courseid' => new external_value(PARAM_INT, 'ID of the course', VALUE_DEFAULT),
             'is_enrolled' => new external_value(PARAM_BOOL, 'Flag indicating whether the user is enrolled', VALUE_DEFAULT),
+        ]);
+    }
+
+    /**
+     * Parameter description for is_enrolled().
+     *
+     * @return external_function_parameters.
+     */
+    public static function subscription_activate_parameters() {
+        $markerCourseId = new external_value(
+            PARAM_INT,
+            'The marker course',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+        $userId = new external_value(
+            PARAM_INT,
+            'The user we want to activate',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+
+        return new external_function_parameters(
+            [
+                'userid' => $userId,
+                'markercourseid' => $markerCourseId,
+            ]
+        );
+    }
+
+    /**
+     * Gets a value indicating whether the given user is enrolled in the given course.
+     *
+     * @param int|null $courseid
+     * @param int|null $userid
+     * @return array
+     */
+    public static function subscription_activate(int $userid, int $markercourseid) {
+        global $DB;
+
+        $return = [
+            'count' => 0,
+            'courses' => [],
+            'infos' => [],
+        ];
+
+        $manualEnrolPlugin = new enrol_manual_plugin();
+
+        // Manuelle Einschreibung im Marker-Kurs prüfen und durchführen
+        $manualEnrol = $DB->get_record('enrol', ['courseid' => $markercourseid, 'enrol' => 'manual']);
+        if (!$manualEnrol) {
+            $return['infos'][] = "Manual enrollment for marker course $markercourseid not found.";
+            return $return;
+        }
+
+        try {
+            $manualEnrolPlugin->enrol_user($manualEnrol, $userid);
+            $course = get_course($markercourseid);
+            $return['courses'][] = $course->fullname;
+            $return['count']++;
+        } catch (\Exception $e) {
+            $return['infos'][] = "Error while enroling to course id $markercourseid: " . $e->getMessage();
+        }
+
+        $sql = "SELECT ue.id AS userenrolid, e.id AS enrolid, e.courseid
+            FROM {user_enrolments} ue
+            JOIN {enrol} e ON ue.enrolid = e.id
+            WHERE ue.userid = :userid AND e.enrol = 'self'";
+
+        $enrolments = $DB->get_records_sql($sql, ['userid' => $userid]);
+
+        if (!$enrolments) {
+            $return['infos'][] = "No self-enrolment found for user id $userid.";
+        }
+
+        foreach ($enrolments as $enrolment) {
+            // Manuelle Einschreibung für den Kurs finden
+            $manualEnrol = $DB->get_record('enrol', ['courseid' => $enrolment->courseid, 'enrol' => 'manual']);
+
+            if (!$manualEnrol) {
+                $return['infos'][] = "Manual enrolment not enabled for course id {$enrolment->courseid}";
+                continue;
+            }
+
+            // Alte Selbst-Einschreibung entfernen
+            try {
+                $DB->delete_records('user_enrolments', ['id' => $enrolment->userenrolid]);
+            } catch (\Exception $e) {
+                $return['infos'][] = "Error removing the self enrolment for course id {$enrolment->courseid}: " . $e->getMessage();
+                continue;
+            }
+
+            // Neue manuelle Einschreibung durchführen
+            try {
+                $manualEnrolPlugin->enrol_user($manualEnrol, $userid);
+                $course = get_course($enrolment->courseid);
+                $return['courses'][] = $course->fullname;
+                $return['count']++;
+            } catch (\Exception $e) {
+                $return['infos'][] = "Error while manually enroling in course id {$enrolment->courseid}: " . $e->getMessage();
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * Parameter description for get_questions().
+     *
+     * @return external_single_structure
+     */
+    public static function subscription_activate_returns() {
+        return new external_single_structure([
+            'count' => new external_value(PARAM_INT, 'Number of changed enrolments', VALUE_DEFAULT),
+            'courses' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'The number of courses the user is self-enrolled in', VALUE_DEFAULT)
+            ),
+            'infos' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'The errors that occured.', VALUE_DEFAULT)
+            )
         ]);
     }
 }
