@@ -61,4 +61,10 @@ $functions = [
         'description' => 'Helper endpoint to change all self enrolments to manual enrolments',
         'type' => 'write',
     ],
+    'plakos_subscription_deactivate' => [
+        'classname' => 'ws_plakos_external',
+        'methodname' => 'subscription_deactivate',
+        'description' => 'Helper endpoint to remove all manual subscriptions',
+        'type' => 'write',
+    ],
 ];

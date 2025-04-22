@@ -845,4 +845,88 @@ class ws_plakos_external extends external_api {
             )
         ]);
     }
+
+    /**
+     * Parameter description for is_enrolled().
+     *
+     * @return external_function_parameters.
+     */
+    public static function subscription_deactivate_parameters() {
+        $markerCourseId = new external_value(
+            PARAM_INT,
+            'The marker course',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+        $userId = new external_value(
+            PARAM_INT,
+            'The user we want to deactivate',
+            VALUE_REQUIRED, null, NULL_NOT_ALLOWED
+        );
+        $excludeCourseIds = new external_value(
+            PARAM_TEXT,
+            'The courses to ignore (comma separated)',
+            VALUE_DEFAULT, null
+        );
+
+        return new external_function_parameters(
+            [
+                'userid' => $userId,
+                'markercourseid' => $markerCourseId,
+                'excludecourseids' => $excludeCourseIds,
+            ]
+        );
+    }
+
+    /**
+     * Gets a value indicating whether the given user is enrolled in the given course.
+     *
+     * @param int|null $courseid
+     * @param int|null $userid
+     * @paran string $excludecourseids
+     * @return array
+     */
+    public static function subscription_deactivate(int $userid, int $markercourseid, string $excludecourseids = '') {
+        global $DB;
+
+        $return = [
+            'count' => 0,
+        ];
+
+        $excluded = array_filter(array_map('intval', explode(',', $excludecourseids)));
+
+        $sql = "SELECT e.id AS enrolid, e.courseid
+              FROM {user_enrolments} ue
+              JOIN {enrol} e ON ue.enrolid = e.id
+             WHERE ue.userid = :userid
+               AND e.enrol = 'manual'";
+
+        $params = ['userid' => $userid];
+        $enrolments = $DB->get_records_sql($sql, $params);
+
+        foreach ($enrolments as $enrolment) {
+            if (!in_array($enrolment->courseid, $excluded)) {
+                $return['count']++;
+                enrol_get_plugin('manual')->unenrol_user(
+                    $DB->get_record('enrol', ['id' => $enrolment->enrolid], '*', MUST_EXIST),
+                    $userid
+                );
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * Parameter description for get_questions().
+     *
+     * @return external_single_structure
+     */
+    public static function subscription_deactivate_returns() {
+        return new external_single_structure([
+            'count' => new external_value(PARAM_INT, 'Number of changed enrolments', VALUE_DEFAULT),
+            'infos' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'The errors that occured.', VALUE_DEFAULT)
+            )
+        ]);
+    }
 }
